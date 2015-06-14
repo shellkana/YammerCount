@@ -73,7 +73,7 @@ javascript: (function() {
                         isFinalSearch = true;
                     }
                 }
-                if (!isFinalSeach && data.messages.length === 20) {
+                if (!isFinalSearch && data.messages.length === 20) {
                     get(url, 0, data.threaded_extended[data.messages[data.messages.length - 1].thread_id][0].id);
                 } else if (n === 1) {
                     getMyMessage(0, false, 0);
