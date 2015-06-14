@@ -29,8 +29,8 @@ javascript: (function() {
                 if (date !== d.getDate()) {
                     n++;
                 }
-                if (n < 1) {
-                    getMyMessage(0, data.messages[data.messages.length - 1].id, currentThread);
+                if (n < 1 && data.messages.length === 20) {
+                    getMyMessage(0, data.messages[19].id, currentThread);
                 } else if (currentThread < threadIds.length - 1) {
                     currentThread++;
                     getMyMessage(0, false, currentThread);
@@ -60,6 +60,8 @@ javascript: (function() {
                 for (i = 0; i < data.messages.length; i++) {
                     if (data.threaded_extended[data.messages[i].thread_id].length > 0) {
                         d.setTime(Date.parse(data.threaded_extended[data.messages[i].thread_id][0].created_at));
+                    } else {
+                        d.setTime(Date.parse(data.messages[i].created_at));
                     }
                     var date = d.getDate();
                     d.setTime(Date.now());
@@ -74,7 +76,11 @@ javascript: (function() {
                     }
                 }
                 if (!isFinalSearch && data.messages.length === 20) {
-                    get(url, 0, data.threaded_extended[data.messages[data.messages.length - 1].thread_id][0].id);
+                    if (data.threaded_extended[data.messages[19].thread_id].length > 0) {
+                        get(url, n, data.threaded_extended[data.messages[19].thread_id][0].id);
+                    } else {
+                        get(url, n, data.messages[19].thread_id);
+                    }
                 } else if (n === 1) {
                     getMyMessage(0, false, 0);
                 }
