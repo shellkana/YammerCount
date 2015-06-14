@@ -7,6 +7,8 @@ javascript: (function() {
     var start = Date.now();
     var myId;
     var alertText = "";
+    $("body").empty();
+    $("body").append("<table></table>");
 
     function getMyMessage(n, last, currentThread) {
         $.ajax({
@@ -50,22 +52,30 @@ javascript: (function() {
     function get(url, n, last) {
         console.log("fetching thread ids...");
         $.ajax({
-            url: url,
+            url: url + (last ? "&older_than=" + last : ""),
             dataType: "json",
             success: function(data) {
                 var i;
+                var isFinalSeach = false;
                 for (i = 0; i < data.messages.length; i++) {
-                    d.setTime(Date.parse(data.messages[i].created_at));
+                    if (data.threaded_extended[data.messages[i].thread_id].length > 0) {
+                        d.setTime(Date.parse(data.threaded_extended[data.messages[i].thread_id][0].created_at));
+                    }
                     var date = d.getDate();
                     d.setTime(Date.now());
-                    if (threadIds.indexOf(data.messages[i].thread_id) === -1) {
+                    if (date === d.getDate()) {
                         threadIds[threadIds.length] = data.messages[i].thread_id;
+                        threadTitle.push(data.messages[i].content_excerpt.split("\n")[0]);
+                        threadCounter.push(0);
+                        $("table").append("<tr><td>%1</td></tr>".replace("%1", data.messages[i].content_excerpt.split("\n")[0]));
+                        $("table").append("<tr><td>%1</td></tr>".replace("%1", date));
+                    } else {
+                        isFinalSeach = true;
                     }
-                    threadTitle.push(data.messages[i].content_excerpt.split("\n")[0]);
-                    threadCounter.push(0);
                 }
-                if (n === 1) {
-                    console.log(data);
+                if (!isFinalSeach && data.messages.length === 20) {
+                    get(url, 0, data.threaded_extended[data.messages[data.messages.length - 1].thread_id][0].id);
+                } else if (n === 1) {
                     getMyMessage(0, false, 0);
                 }
             }
