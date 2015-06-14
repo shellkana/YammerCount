@@ -56,7 +56,7 @@ javascript: (function() {
             dataType: "json",
             success: function(data) {
                 var i;
-                var isFinalSeach = false;
+                var isFinalSearch = false;
                 for (i = 0; i < data.messages.length; i++) {
                     if (data.threaded_extended[data.messages[i].thread_id].length > 0) {
                         d.setTime(Date.parse(data.threaded_extended[data.messages[i].thread_id][0].created_at));
@@ -70,7 +70,7 @@ javascript: (function() {
                         $("table").append("<tr><td>%1</td></tr>".replace("%1", data.messages[i].content_excerpt.split("\n")[0]));
                         $("table").append("<tr><td>%1</td></tr>".replace("%1", date));
                     } else {
-                        isFinalSeach = true;
+                        isFinalSearch = true;
                     }
                 }
                 if (!isFinalSeach && data.messages.length === 20) {
