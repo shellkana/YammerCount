@@ -7,6 +7,9 @@ javascript: (function() {
     var start = Date.now();
     var myId;
     var alertText = "";
+    var completeSeen = false;
+    var completeUnseen = false;
+    var completeBoth = false;
     $("body").empty();
     $("body").append("<table></table>");
 
@@ -75,15 +78,22 @@ javascript: (function() {
                         isFinalSearch = true;
                     }
                 }
+                if (n == 1) {
+                    completeSeen = true;
+                } else {
+                    completeUnseen = true;
+                }
                 if (!isFinalSearch && data.messages.length === 20) {
                     if (data.threaded_extended[data.messages[19].thread_id].length > 0) {
                         get(url, n, data.threaded_extended[data.messages[19].thread_id][0].id);
                     } else {
                         get(url, n, data.messages[19].thread_id);
                     }
-                } else if (n === 1) {
+                } else if (completeSeen && completeUnseen && !completeBoth) {
                     getMyMessage(0, false, 0);
+                    completeBoth = true;
                 }
+
             }
         });
     }
@@ -91,8 +101,8 @@ javascript: (function() {
         url: "https://www.yammer.com/api/v1/users/current.json",
         success: function(data) {
             myId = data.id;
-            get("https://www.yammer.com/api/v1/messages/inbox.json?filter=inbox_unseen", 0);
-            get("https://www.yammer.com/api/v1/messages/inbox.json?filter=inbox_seen", 1);
+            get("https://www.yammer.com/api/v1/messages/inbox.json?filter=inbox_unseen", 1);
+            get("https://www.yammer.com/api/v1/messages/inbox.json?filter=inbox_seen", 0);
         }
     });
 })();
