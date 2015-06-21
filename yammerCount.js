@@ -1,5 +1,10 @@
 javascript: (function() {
+   
+    var dateString = window.prompt("‚¢‚ÂˆÈ~‚Ì”‚ğ”‚¦‚½‚¢‚©yyyy/MM/dd hh:mmŒ`®‚Å“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B\n—á2015/06/20 19:00");
+    
+    var countFrom = new Date(dateString);
     var d = new Date();
+    
     var threadIds = [];
     var threadTitle = [];
     var threadCounter = [];
@@ -10,6 +15,7 @@ javascript: (function() {
     var completeSeen = false;
     var completeUnseen = false;
     var completeBoth = false;
+        
     $("body").empty();
     $("body").append("<table></table>");
 
@@ -22,14 +28,14 @@ javascript: (function() {
                 var i;
                 for (i = 0; i < data.messages.length; i++) {
                     d.setTime(Date.parse(data.messages[i].created_at));
-                    var date = d.getDate();
-                    d.setTime(Date.now());
-                    if (data.messages[i].sender_id === myId && date === d.getDate()) {
+//                    var date = d.getDate();
+//                    d.setTime(Date.now());
+                    if (data.messages[i].sender_id === myId && countFrom < d) {
                         count++;
                         threadCounter[currentThread]++;
                     }
-                }
-                if (date !== d.getDate()) {
+                };
+                if (countFrom > d) {
                     n++;
                 }
                 if (n < 1 && data.messages.length === 20) {
@@ -66,14 +72,14 @@ javascript: (function() {
                     } else {
                         d.setTime(Date.parse(data.messages[i].created_at));
                     }
-                    var date = d.getDate();
-                    d.setTime(Date.now());
-                    if (date === d.getDate()) {
+//                    var date = d.getDate();
+//                   d.setTime(Date.now());
+                    if (countFrom < d) {
                         threadIds[threadIds.length] = data.messages[i].thread_id;
                         threadTitle.push(data.messages[i].content_excerpt.split("\n")[0]);
                         threadCounter.push(0);
                         $("table").append("<tr><td>%1</td></tr>".replace("%1", data.messages[i].content_excerpt.split("\n")[0]));
-                        $("table").append("<tr><td>%1</td></tr>".replace("%1", date));
+                        $("table").append("<tr><td>%1</td></tr>".replace("%1", d.getDate()));
                     } else {
                         isFinalSearch = true;
                     }
