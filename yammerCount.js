@@ -2,7 +2,20 @@ javascript: (function() {
    
     var dateString = window.prompt("‚¢‚ÂˆÈ~‚Ì”‚ð”‚¦‚½‚¢‚©yyyy/MM/dd hh:mmŒ`Ž®‚Å“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B\n—á2015/06/20 19:00");
     
-    var countFrom = new Date(dateString);
+    var countFrom;
+    if(dateString == ""){
+        countFrom = new Date();
+        countFrom.setHours(5);
+        countFrom.setMinutes(0);
+        countFrom.setSeconds(0);
+        
+        //true -> 0:00--4:59‚É‹N“®
+        if(countFrom > new Date()) 
+            countFrom.setTime(countFrom.getTime() - 86400000);
+        
+    }else
+        countFrom = new Date(dateString);
+    
     var d = new Date();
     
     var threadIds = [];
@@ -15,6 +28,8 @@ javascript: (function() {
     var completeSeen = false;
     var completeUnseen = false;
     var completeBoth = false;
+
+    var isPM = [];
         
     $("body").empty();
     $("body").append("<table></table>");
@@ -28,11 +43,11 @@ javascript: (function() {
                 var i;
                 for (i = 0; i < data.messages.length; i++) {
                     d.setTime(Date.parse(data.messages[i].created_at));
-//                    var date = d.getDate();
-//                    d.setTime(Date.now());
                     if (data.messages[i].sender_id === myId && countFrom < d) {
-                        count++;
-                        threadCounter[currentThread]++;
+                        if(!isPM[currentThread]){                           
+                            threadCounter[currentThread]++;
+                            count++;
+                        } 
                     }
                 };
                 if (countFrom > d) {
@@ -47,9 +62,11 @@ javascript: (function() {
                     var calcTime = (Date.now() - start) / 1000;
                     for (i = 0; i < threadCounter.length; i++) {
                         console.log(threadTitle[i] + "::" + threadCounter[i]);
-                        alertText += threadTitle[i] + "::" + threadCounter[i] + "\n";
+                        
+                        if(!isPM[i])
+                            alertText += threadTitle[i] + "::" + threadCounter[i] + "\n";
                     }
-                    alert("total:" + count + "\n" + alertText + "time:" + calcTime);
+                    alert("countFrom:\n" + countFrom.toString() + "\n" + "total:" + count + "\n" + alertText + "time:" + calcTime);
                 }
             },
             error: function() {
@@ -72,11 +89,11 @@ javascript: (function() {
                     } else {
                         d.setTime(Date.parse(data.messages[i].created_at));
                     }
-//                    var date = d.getDate();
-//                   d.setTime(Date.now());
                     if (countFrom < d) {
+                        
                         threadIds[threadIds.length] = data.messages[i].thread_id;
                         threadTitle.push(data.messages[i].content_excerpt.split("\n")[0]);
+                        isPM.push(data.messages[i].privacy == "private");
                         threadCounter.push(0);
                         $("table").append("<tr><td>%1</td></tr>".replace("%1", data.messages[i].content_excerpt.split("\n")[0]));
                         $("table").append("<tr><td>%1</td></tr>".replace("%1", d.getDate()));
